@@ -12,7 +12,14 @@ is written.
 ### `GET /health`
 
 ```json
-{"status": "healthy", "watching": "logs/eve.json"}
+{
+  "status": "healthy",
+  "models_loaded": 7,
+  "placeholder_models": ["ddos", "xss"],
+  "timestamp": "2026-10-09T12:00:00Z"
+}
+
+**Note:** A placeholder model is a fallback implementation used when a fully trained model is not yet available for a specific threat category.
 ```
 
 ### `GET /stats`

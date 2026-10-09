@@ -516,12 +516,17 @@ async def startup_event():
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
+    placeholder_models = [
+        name for name, model in MODEL_REGISTRY.items()
+        if getattr(model, 'is_placeholder', False)
+    ]
+    
     return {
         "status": "healthy",
         "models_loaded": len(MODEL_REGISTRY),
+        "placeholder_models": placeholder_models,
         "timestamp": datetime.now().isoformat()
     }
-
 
 @app.get("/models", response_model=List[ModelInfo])
 async def list_models():
@@ -529,13 +534,16 @@ async def list_models():
     models_info = []
     
     for name, info in MODEL_REGISTRY.items():
+        is_placeholder = getattr(info.get('model'), 'is_placeholder', False) if isinstance(info, dict) else getattr(info, 'is_placeholder', False)
+        
         models_info.append(ModelInfo(
             name=name,
             type=info['type'],
             loaded=True,
+            is_placeholder=is_placeholder,
             last_updated=info['loaded_at'],
             version=info['version'],
-            metrics=None  # Could add accuracy, precision, etc.
+            metrics=None
         ))
     
     return models_info
